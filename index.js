@@ -24,7 +24,7 @@ mongoose.connect(MONGO_URI, {
   .catch((err) => {
     console.error("MongoDB connection error:", err.message);
     process.exit(1); // Exit if DB connection fails
-  });
+  }); 
 
 // Register Route
 app.post('/register', async (req, res) => {
@@ -219,3 +219,5 @@ app.put('/edit/:id', verifyToken, async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+module.exports = app;
