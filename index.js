@@ -3,31 +3,43 @@ const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const UserModel = require('./models/user');
-const NotesModel = require('./models/Notes');
+const UserModel = require("./models/user");
+const NotesModel = require("./models/Notes");
+const cors = require('cors');
+
+
 
 const app = express();
 const PORT = 5000;
-const MONGO_URI=process.env.MONGO_URI || "mongodb+srv://Nagraj:Nandal1323@cluster0.gljq1.mongodb.net/Notations?";
+const MONGO_URI =
+  process.env.MONGO_URI ||
+  "mongodb+srv://Nagraj:Nandal1323@cluster0.gljq1.mongodb.net/Notations?";
 // Environment variables for security
-const TOKEN_SECRET = process.env.TOKEN_SECRET || "default_secret_key";
+const TOKEN_SECRET =
+  process.env.TOKEN_SECRET || "I5N2ZlYzdmMzc5YjciLCJpYXQiOjE3MzIwMjc";
 
 // Middleware
 app.use(bodyParser.json());
+app.use(cors());
 
 // Connect to MongoDB
-mongoose.connect(MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
+mongoose
+  .connect(MONGO_URI, {
+    useNewUrlParser: true,
+    serverSelectionTimeoutMS: 5000
+  })
   .then(() => console.log("MongoDB connected"))
   .catch((err) => {
     console.error("MongoDB connection error:", err.message);
     process.exit(1); // Exit if DB connection fails
-  }); 
+  });
 
+
+app.get('/',(req,res)=>{
+  res.send("hello")
+})
 // Register Route
-app.post('/register', async (req, res) => {
+app.post("/register", async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -72,7 +84,7 @@ const verifyToken = (req, res, next) => {
 };
 
 // Login Route
-app.post('/login', async (req, res) => {
+app.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -104,12 +116,14 @@ app.post('/login', async (req, res) => {
 });
 
 // Create Note Route
-app.post('/create',verifyToken, async (req, res) => {
-  const { title, content,  user_id: userId  } = req.body;
+app.post("/create", verifyToken, async (req, res) => {
+  const { title, content, user_id: userId } = req.body;
 
-  console.log(userId)
-  if (!title || !content || !userId ) {
-    return res.status(400).json({ message: "Title, content, and user ID are required" });
+  console.log(userId);
+  if (!title || !content || !userId) {
+    return res
+      .status(400)
+      .json({ message: "Title, content, and user ID are required" });
   }
 
   try {
@@ -123,23 +137,27 @@ app.post('/create',verifyToken, async (req, res) => {
     // Save the note
     const savedNote = await note.save();
 
-    console.log(savedNote)
+    console.log(savedNote);
     // Update the user's notes array
     await UserModel.findByIdAndUpdate(userId, {
       $push: { notes: savedNote._id },
     });
 
-    res.status(201).json({ message: "Note created successfully", note: savedNote });
+    res
+      .status(201)
+      .json({ message: "Note created successfully", note: savedNote });
   } catch (e) {
     console.error("Error creating note:", e);
     res.status(500).json({ message: "Internal server error" });
   }
 });
 
-
-app.get('/notes', verifyToken, async (req, res) => {
+app.get("/notes", verifyToken, async (req, res) => {
   try {
-    const userNotes = await NotesModel.find({ user: req.userId }).populate('user', 'email');
+    const userNotes = await NotesModel.find({ user: req.userId }).populate(
+      "user",
+      "email"
+    );
     res.status(200).json({ notes: userNotes });
   } catch (e) {
     console.error("Error fetching notes:", e);
@@ -147,8 +165,7 @@ app.get('/notes', verifyToken, async (req, res) => {
   }
 });
 
-
-app.delete('/delete/:id', verifyToken, async (req, res) => {
+app.delete("/delete/:id", verifyToken, async (req, res) => {
   const noteId = req.params.id;
 
   if (!noteId || !mongoose.Types.ObjectId.isValid(noteId)) {
@@ -176,7 +193,7 @@ app.delete('/delete/:id', verifyToken, async (req, res) => {
   }
 });
 
-app.put('/edit/:id', verifyToken, async (req, res) => {
+app.put("/edit/:id", verifyToken, async (req, res) => {
   console.log("Edit route hit"); // Debug log
   const noteId = req.params.id;
   const { title, content } = req.body;
@@ -205,15 +222,14 @@ app.put('/edit/:id', verifyToken, async (req, res) => {
       return res.status(404).json({ error: "Note not found or access denied" });
     }
 
-    res.status(200).json({ message: "Note updated successfully", note: updatedNote });
+    res
+      .status(200)
+      .json({ message: "Note updated successfully", note: updatedNote });
   } catch (error) {
     console.error("Error updating note:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
-
-
-
 
 // Start the server
 app.listen(PORT, () => {
