@@ -10,18 +10,21 @@ const cors = require("cors");
 const app = express();
 const PORT = 5000;
 const MONGO_URI =
-  process.env.MONGO_URI ||
-  "";
-
+  "mongodb+srv://Nagraj:AnjaliN2313@cluster0.gljq1.mongodb.net/Notations?retryWrites=true&w=majority";
 const TOKEN_SECRET =
   process.env.TOKEN_SECRET || "I5N2ZlYzdmMzc5YjciLCJpYXQiOjE3MzIwMjc";
 
 app.use(bodyParser.json());
-app.use(cors());
+const corsOptions = {
+  origin: ["http://localhost:5173"], // or deploy URL like "https://yourfrontend.com"
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+app.use(cors(corsOptions))
 
 mongoose
   .connect(MONGO_URI, {
-    useNewUrlParser: true,
     serverSelectionTimeoutMS: 5000,
   })
   .then(() => console.log("MongoDB connected"))
