@@ -9,8 +9,8 @@ const cors = require("cors");
 
 const app = express();
 const PORT = 5000;
-const MONGO_URI =
-  "";
+const MONGO_URI =process.env.MONGO_URI;
+
 const TOKEN_SECRET =
   process.env.TOKEN_SECRET || "I5N2ZlYzdmMzc5YjciLCJpYXQiOjE3MzIwMjc";
 
