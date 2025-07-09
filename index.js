@@ -10,7 +10,7 @@ const cors = require("cors");
 const app = express();
 const PORT = 5000;
 const MONGO_URI =
-  "mongodb+srv://Nagraj:AnjaliN2313@cluster0.gljq1.mongodb.net/Notations?retryWrites=true&w=majority";
+  "";
 const TOKEN_SECRET =
   process.env.TOKEN_SECRET || "I5N2ZlYzdmMzc5YjciLCJpYXQiOjE3MzIwMjc";
 
